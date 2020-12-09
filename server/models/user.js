@@ -31,11 +31,13 @@ const UserShcema = new mongoose.Schema({
         ref: "post",
       },
       comment_id: {
-        type: mongoose.Schema.type.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "comments",
       },
     },
   ],
+
+  
 });
 
 const User = mongoose.model("User", UserShcema);
