@@ -5,17 +5,20 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev" : "nodemon ./server/server.js --exec babel-node"
+    "dev": "nodemon ./server/server.js --exec babel-node --ignore './client'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "helmet": "^4.2.0",
+    "history": "^5.0.0",
     "hpp": "^0.2.3",
+    "jsonwebtoken": "^8.5.1",
     "mogoose": "0.0.1-security",
     "moment": "^2.29.1",
     "mongoose": "^5.10.17"
@@ -26,7 +29,6 @@
     "@babel/node": "^7.12.6",
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.12.7",
-    "babel-loader": "^8.2.2",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.6"
   }
