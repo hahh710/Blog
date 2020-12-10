@@ -24,6 +24,7 @@ const postReducer = (state = initialState, action) => {
     case POST_LOADING_REQUEST:
       return {
         ...state,
+        posts: [],
         isLoading: true,
       };
     case POST_LOADING_SUCCESS:
