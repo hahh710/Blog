@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.809.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
@@ -21,7 +22,10 @@
     "jsonwebtoken": "^8.5.1",
     "mogoose": "0.0.1-security",
     "moment": "^2.29.1",
-    "mongoose": "^5.10.17"
+    "mongoose": "^5.10.17",
+    "multer": "^1.4.2",
+    "multer-s3": "^2.9.0",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.8",
