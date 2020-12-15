@@ -3,6 +3,8 @@ import auth from "../../middleware/auth";
 
 //Model
 import Post from "../../models/post";
+import Category from "../../models/category";
+import User from "../../models/user";
 
 const router = express.Router();
 
@@ -11,6 +13,7 @@ import multerS3 from "multer-s3";
 import path from "path";
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
+import { isNullOrUndefined } from "util";
 
 dotenv.config();
 
@@ -55,26 +58,88 @@ router.post("/image", uploadS3.array("upload", 10), async (req, res, next) => {
   }
 });
 
-//  api/post
+//  @route  GET api/post/
+//  @desc   Getting All posts
+//  @access public
 router.get("/", async (req, res) => {
   const postFindResult = await Post.find(); // Post is mongoose model, and contains find() method for finding
   console.log(postFindResult, "All Post are found.");
   res.json(postFindResult);
 });
 
-router.post("/", auth, async (req, res) => {
+//  @route  POST /api/post/
+//  @desc   Creating new post
+//  @acess  Private
+router.post("/", auth, uploadS3.none(), async (req, res) => {
+  //uploadS3 is middle ware to upload data to S3, However,
+  //images used in editor is already uploaded before this method, Therefore, None()
   try {
     console.log(req, "req");
-    const { title, contents, fileUrl, creator } = req.body;
+    const { title, contents, fileUrl, creator, category } = req.body;
     const newPost = await Post.create({
       //만들어주세요
       title, //this means title: title
       contents,
       fileUrl,
       creator,
+      date: moment().format("YYYY-MM-DD hh:mm:ss"),
     });
+
+    const findResult = await Category.findOne({
+      categoryName: category,
+    });
+
+    console.log(findResult, "Category Found");
+
+    if (isNullOrUndefined(findResult)) {
+      const newCategory = await Category.create({
+        categoryName: category,
+      });
+      console.log(newCategory, "New Category is created");
+
+      //Referencing new Category to newPost
+      await Post.findByIdAndUpdate(newPost._id, {
+        $push: { categories: newCategory._id },
+      });
+
+      //Referencing post to new Category
+      await Category.findByIdAndUpdate(newCategory._id, {
+        $push: { posts: newPost._id },
+      });
+
+      await User.findByIdAndUpdate(req.user._id, {
+        $push: {
+          posts: newPost._id,
+        },
+      });
+    } else {
+      await Category.findByIdAndUpdate(findResult._id, {
+        $push: { posts: newPost._id },
+      });
+
+      await Post.findByIdAndUpdate(newPost._id, {
+        $push: { categories: newCategory._id },
+      });
+    }
+
     res.json(newPost);
-  } catch (e) {}
+    return res.redirect(`/api/post/${newPost._id}`);
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+//  @route  GET  api/post/:id
+//  @desc   Detail Post
+//  @access Public
+router.get("/:id", async (req, res) => {
+  try {
+    const post = await (await Post.findById(req.params.id))
+      .populate("creator", "name")
+      .populate({ path: "category", select: "categoryName" });
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 export default router;
