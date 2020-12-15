@@ -113,4 +113,4 @@ const Myinit = (editor) => {
   };
 };
 
-//from https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html
+export default Myinit;
