@@ -21,10 +21,12 @@ const PostSchema = new mongoose.Schema({
     type: String,
     default: "https://source.unsplash.com/random/301x201",
   },
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "category",
-  },
+  categories: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "category",
+    },
+  ],
   date: {
     type: String,
     default: moment().format("YYYY-MM-DD hh:mm:ss"),

@@ -36,8 +36,14 @@ const UserShcema = new mongoose.Schema({
       },
     },
   ],
-
-  
+  posts: [
+    {
+      post_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "post",
+      },
+    },
+  ],
 });
 
 const User = mongoose.model("User", UserShcema);
