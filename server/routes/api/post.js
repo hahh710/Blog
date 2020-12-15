@@ -11,6 +11,7 @@ import multerS3 from "multer-s3";
 import path from "path";
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 //s3 Configuration
@@ -19,7 +20,7 @@ const s3 = new AWS.S3({
   secretAccessKey: process.env.AWS_PRIVATE_KEY,
 });
 
-const uploadS3 = multer.MulterError({
+const uploadS3 = multer({
   storage: multerS3({
     s3,
     bucket: "sideprojectblog/upload",
@@ -43,8 +44,8 @@ router.post("/image", uploadS3.array("upload", 10), async (req, res, next) => {
     console.log(req.files.map((v) => v.location));
     res.json({
       uploaded: true,
-      url: req.files.map((v)=>v.location)
-    })
+      url: req.files.map((v) => v.location),
+    });
   } catch (e) {
     console.error(e);
     res.json({
