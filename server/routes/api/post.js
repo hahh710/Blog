@@ -5,6 +5,7 @@ import auth from "../../middleware/auth";
 import Post from "../../models/post";
 import Category from "../../models/category";
 import User from "../../models/user";
+import moment from "moment";
 
 const router = express.Router();
 
@@ -81,7 +82,7 @@ router.post("/", auth, uploadS3.none(), async (req, res) => {
       title, //this means title: title
       contents,
       fileUrl,
-      creator,
+      creator: req.user.id,
       date: moment().format("YYYY-MM-DD hh:mm:ss"),
     });
 
@@ -123,6 +124,7 @@ router.post("/", auth, uploadS3.none(), async (req, res) => {
     }
 
     res.json(newPost);
+
     return res.redirect(`/api/post/${newPost._id}`);
   } catch (e) {
     console.log(e);
