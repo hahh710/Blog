@@ -15,6 +15,7 @@ import {
 
 import Myinit from "../../components/editor/UploadAdapter";
 import dotenv from "dotenv";
+import { POST_UPLOAD_REQUEST } from "../../redux/types";
 dotenv.config();
 
 const PostWrite = () => {
@@ -33,6 +34,12 @@ const PostWrite = () => {
   const onSubmit = async (e) => {
     await e.preventDefault();
     const { title, contents, fileUrl, category } = form;
+    const token = localStorage.getItem("token");
+    const body = { title, contents, fileUrl, category, token };
+    dispatch({
+      type: POST_UPLOAD_REQUEST,
+      payload: body,
+    });
   };
 
   const getDataFromEditor = (event, editor) => {
@@ -70,7 +77,7 @@ const PostWrite = () => {
 
   return (
     <div>
-      <Form>
+      <Form onSubmit={onSubmit}>
         <FormGroup className="mb-3">
           <Label for="title">Title</Label>
           <Input
