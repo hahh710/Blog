@@ -2,19 +2,22 @@ import React, { Fragment, useEffect } from "react";
 import CKEditor from "@ckeditor/ckeditor5-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import {} from "react-helmet";
+import { Helmet } from "react-helmet";
 import { Row, Col, Button } from "reactstrap";
 import {
   POST_DETAIL_LOADING_REQUEST,
   POST_DELETE_REQUEST,
   USER_LOADING_REQUEST,
 } from "../../redux/types";
+import { GrowingSpinner } from "../../components/spinner/Spinner";
 
 const PostDetail = (req) => {
   const dispatch = useDispatch();
-  const { PostDetail, creatorId, title } = useSelector((state) => state.post);
-  const { userName, userId } = useSelector((state) => state.auth);
+  const { postDetail, creatorId, title, isLoading } = useSelector(
+    (state) => state.post
+  );
 
+  const { userName, userId } = useSelector((state) => state.auth);
   console.log(req.match.params.id, "Post Detail Params ID");
   useEffect(() => {
     dispatch({
@@ -73,7 +76,38 @@ const PostDetail = (req) => {
       </Row>
     </Fragment>
   );
-  return <h1>PostDetail</h1>;
+  console.log(postDetail, "PostDetail");
+  //console.log(creator, "Creator");
+  const Body = (
+    <>
+      {userId === creatorId ? EditButton : HomeButton}
+      <Row className="border-bottom border-top border-primary p-3 mb-3 justify-content-between">
+        {(() => {
+          if (postDetail && postDetail.creator) {
+            return (
+              <Fragment>
+                <div className="font-weight-bold text-big">
+                  <span className="mr-3">
+                    {postDetail.categories.map((category) => (
+                      <Button color="info">{category.categoryName}</Button>
+                    ))}
+                  </span>
+                  {postDetail.title}
+                </div>
+                <div className="align-self-end">{postDetail.creator.name}</div>
+              </Fragment>
+            );
+          }
+        })()}
+      </Row>
+    </>
+  );
+  return (
+    <div>
+      <Helmet title={`Post | ${title}`}></Helmet>
+      {isLoading === true ? GrowingSpinner : Body}
+    </div>
+  );
 };
 
 export default PostDetail;

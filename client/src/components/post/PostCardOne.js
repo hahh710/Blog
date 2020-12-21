@@ -25,7 +25,7 @@ const PostCardOne = ({ posts }) => {
                   className="text-dark text-decoration-none"
                 >
                   <Card className="mb-3">
-                    <CardImg top alt={emptyImage} src={fileUrl} />
+                    <CardImg top alt="" src={fileUrl} />
                     <CardBody>
                       <CardTitle
                         className="text-truncate d-flex justify-content-between"

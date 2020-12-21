@@ -75,7 +75,7 @@ const postReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         postDetail: action.payload,
-        creatorId: action.payload._id,
+        creatorId: action.payload.creator._id,
         title: action.payload.title,
       };
     case POST_DETAIL_LOADING_FAILURE:

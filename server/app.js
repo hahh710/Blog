@@ -35,6 +35,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
+    useFindAndModify: false,
   })
   .then(() => console.log("MongoDB connecting Success."))
   .catch((e) => console.log(e));
@@ -44,6 +45,5 @@ app.get("/");
 app.use("/api/post", postRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
-
 
 export default app;
