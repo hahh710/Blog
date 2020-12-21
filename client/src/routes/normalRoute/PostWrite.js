@@ -57,7 +57,7 @@ const PostWrite = () => {
           whereImgEnd = data.indexOf(ext_name[i]);
           //console.log(whereImgEnd, ext_name[i], "IMG end");
           result_url =
-            data.substring(whereImgStart + 9, whereImgEnd) + ext_name[i];
+            data.substring(whereImgStart + 10, whereImgEnd) + ext_name[i];
         }
       }
       console.log(result_url, "First Picture of URL From the Editor");

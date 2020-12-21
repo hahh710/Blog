@@ -42,14 +42,14 @@ function* watchLoadPosts() {
 
 //Post Detail
 const loadPostDetailAPI = (payload) => {
-  console.log(payload);
+  console.log(payload, "Payload");
   return axios.get(`/api/post/${payload}`);
 };
 
 function* loadPostDetail(action) {
   try {
     const result = yield call(loadPostDetailAPI, action.payload);
-    console.log(action, "Post Detail Saga");
+    console.log(result, "Post Detail Saga");
 
     yield put({
       type: POST_DETAIL_LOADING_SUCCESS,
@@ -60,6 +60,7 @@ function* loadPostDetail(action) {
       type: POST_DETAIL_LOADING_FAILURE,
       payload: e,
     });
+    console.log("Load Post Detail Error");
     yield put(push("/"));
   }
 }
@@ -85,7 +86,6 @@ const uploadPostAPI = (payload) => {
 function* uploadPost(action) {
   try {
     const result = yield call(uploadPostAPI, action.payload);
-    console.log(result, "upLoadPost");
     yield put({
       type: POST_UPLOAD_SUCCESS,
       payload: result.data,
