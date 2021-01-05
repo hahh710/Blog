@@ -301,7 +301,7 @@ export const editorConfiguration = {
     },
   },
 
-  language: "en",
+  language: "ko",
 
   simpleUpload: {
     uploadUrl: `${process.env.REACT_APP_BASIC_SERVER_URL}/api/posts/image`,
