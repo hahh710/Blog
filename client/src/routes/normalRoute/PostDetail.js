@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect } from "react";
-import CKEditor from "@ckeditor/ckeditor5-react";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
@@ -10,6 +10,14 @@ import {
   USER_LOADING_REQUEST,
 } from "../../redux/types";
 import { GrowingSpinner } from "../../components/spinner/Spinner";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPencilAlt,
+  faCommentDots,
+  faEye,
+} from "@fortawesome/free-solid-svg-icons";
+import BalloonEditor from "@ckeditor/ckeditor5-editor-balloon/src/ballooneditor";
+import { editorConfiguration } from "../../components/editor/EditorConfig";
 
 const PostDetail = (req) => {
   const dispatch = useDispatch();
@@ -81,27 +89,66 @@ const PostDetail = (req) => {
   const Body = (
     <>
       {userId === creatorId ? EditButton : HomeButton}
-      <Row className="border-bottom border-top border-primary p-3 mb-3 justify-content-between">
+      {
+        <Row className="border-top border-primary d-flex p-1 mb-3 justify-content-between">
+          <div>
+            <Button className="align-self-end" color="info">
+              categories
+            </Button>
+          </div>
+        </Row>
+      }
+      <Row className="border-bottom border-top border-primary d-flex p-3 mb-3 justify-content-between">
         {(() => {
           if (postDetail && postDetail.creator) {
             return (
               <Fragment>
                 <div className="font-weight-bold text-big">
-                  <span className="mr-3">
+                  <span className="mr-3 ">
                     {postDetail.categories.map((category) => (
-                      <Button color="info">{category.categoryName}</Button>
+                      <Button className="align-self-end" color="info">
+                        {category.categoryName}
+                      </Button>
                     ))}
                   </span>
                   {postDetail.title}
                 </div>
+
                 <div className="align-self-end">{postDetail.creator.name}</div>
               </Fragment>
             );
           }
         })()}
       </Row>
+      {postDetail && postDetail.comments ? (
+        <Fragment>
+          <div className="d-flex justify-content-end align-items-baseline small">
+            <FontAwesomeIcon icon={faPencilAlt} />
+            &nbsp;
+            <span> {postDetail.date}</span>
+            &nbsp;&nbsp;
+            <FontAwesomeIcon icon={faCommentDots} />
+            &nbsp;
+            <span>{postDetail.comments.length}</span>
+            &nbsp;&nbsp;
+            <FontAwesomeIcon icon={faEye} />
+            <span>{postDetail.views}</span>
+          </div>
+          <div className="mb-3">
+            <CKEditor
+              editor={BalloonEditor}
+              config={editorConfiguration}
+              data={postDetail.contents}
+              disabled="true"
+            />
+          </div>
+        </Fragment>
+      ) : (
+        <h1>Hi</h1>
+      )}
     </>
   );
+
   return (
     <div>
       <Helmet title={`Post | ${title}`}></Helmet>
