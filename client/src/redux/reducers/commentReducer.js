@@ -2,9 +2,9 @@ import {
   COMMENT_LOADING_REQUEST,
   COMMENT_LOADING_SUCCESS,
   COMMENT_LOADING_FAILURE,
-  COMMENT_UPLOAD_REQUEST,
-  COMMENT_UPLOAD_SUCCESS,
-  COMMENT_UPLOAD_FAILURE,
+  COMMENT_UPLOADING_REQUEST,
+  COMMENT_UPLOADING_SUCCESS,
+  COMMENT_UPLOADING_FAILURE,
 } from "../types";
 
 const initialState = {
@@ -37,13 +37,13 @@ const commentReduecer = (state = initialState, action) => {
         error: "Faild to load comments",
       };
 
-    case COMMENT_UPLOAD_REQUEST:
+    case COMMENT_UPLOADING_REQUEST:
       return {
         ...state,
         loading: true,
       };
 
-    case COMMENT_UPLOAD_SUCCESS:
+    case COMMENT_UPLOADING_SUCCESS:
       return {
         ...state,
         loading: false,
@@ -51,7 +51,7 @@ const commentReduecer = (state = initialState, action) => {
         isAuthenticated: true,
       };
 
-    case COMMENT_UPLOAD_FAILURE:
+    case COMMENT_UPLOADING_FAILURE:
       return {
         ...state,
         loading: false,

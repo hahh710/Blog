@@ -28,7 +28,7 @@ const UserShcema = new mongoose.Schema({
     {
       post_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "post",
+        ref: "posts",
       },
       comment_id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -38,10 +38,8 @@ const UserShcema = new mongoose.Schema({
   ],
   posts: [
     {
-      post_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "post",
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "posts",
     },
   ],
 });
