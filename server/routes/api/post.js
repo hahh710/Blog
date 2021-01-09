@@ -5,6 +5,7 @@ import auth from "../../middleware/auth";
 import Post from "../../models/post";
 import Categories from "../../models/category";
 import User from "../../models/user";
+import Comment from "../../models/comment";
 import moment from "moment";
 
 const router = express.Router();
@@ -15,6 +16,7 @@ import path from "path";
 import AWS from "aws-sdk";
 import dotenv from "dotenv";
 import { isNullOrUndefined } from "util";
+import Category from "../../models/category";
 
 dotenv.config();
 
@@ -137,6 +139,33 @@ router.post("/", auth, uploadS3.none(), async (req, res) => {
   }
 });
 
+//  @route  DELETE api/post/:id
+//  @desc   Deleting the post
+//  @access private
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    console.log(req);
+    await Post.deleteMany({ _id: req.params.id });
+    await Comment.deleteMany({ post: req.params.id });
+    await User.findByIdAndUpdate(req.user.id, {
+      $pull: {
+        posts: req.params.id,
+        comments: { post_id: req.params.id },
+      },
+    });
+    const foundCategory = await Category.findOneAndUpdate(
+      { posts: req.params.id },
+      { $pull: { posts: req.params.id } },
+      { new: true }
+    );
+    if (foundCategory.posts.length <= 0) {
+      await Category.deleteMany({ _id: foundCategory._id });
+    }
+
+    res.json({ sucess: true });
+  } catch (e) {}
+});
+
 //  @route  GET  api/post/:id
 //  @desc   Detail Post
 //  @access Public
@@ -153,6 +182,62 @@ router.get("/:id", async (req, res, next) => {
   } catch (e) {
     console.error(e, "GET FIND BY ID ERROR");
     next(e);
+  }
+});
+
+// Comment Router Settings
+
+//  @route  GET /api/post/:id/comments
+//  @desc   Getting all comment from related post
+//  @access public
+
+router.get("/:id/comments", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id).populate({
+      path: "comments",
+    });
+    //console.log(post, "post comment populated");
+    const result = post.comments;
+    //console.log(result, "retrieved comments");
+    res.json(result);
+  } catch (e) {
+    console.error(e, "COULD NOT GET COMMENT");
+  }
+});
+
+//  @route  POST /:id/comments
+//  @desc   POST the comment
+//  @access Private
+
+router.post("/:id/comments", async (req, res, next) => {
+  //console.log(req.body, "bodyy");
+  const newComment = await Comment.create({
+    contents: req.body.contents,
+    creator: req.body.userId,
+    creatorName: req.body.userName,
+    post: req.body.id,
+    date: moment().format("YYYY-MM-DD hh:mm:ss"),
+  });
+  //console.log(newComment, "New Comment");
+  try {
+    // Post model contains comment's id to retrieve comments, Therefore, inserting new comment's id to related post.
+    await Post.findByIdAndUpdate(req.body.id, {
+      $push: {
+        comments: newComment._id,
+      },
+    });
+    // User model contains all comments which the user has uploaded, therefore, instering new comment's id to user.
+    await User.findByIdAndUpdate(req.body.userId, {
+      $push: {
+        comments: {
+          post_id: req.body.id,
+          comment_id: newComment._id,
+        },
+      },
+    });
+    res.json(newComment);
+  } catch (e) {
+    console.error(e, "Could not upload a comment");
   }
 });
 

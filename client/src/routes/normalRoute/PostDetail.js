@@ -3,7 +3,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Row, Col, Button } from "reactstrap";
+import { Row, Col, Button, Container } from "reactstrap";
 import {
   POST_DETAIL_LOADING_REQUEST,
   POST_DELETE_REQUEST,
@@ -18,6 +18,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import BalloonEditor from "@ckeditor/ckeditor5-editor-balloon/src/ballooneditor";
 import { editorConfiguration } from "../../components/editor/EditorConfig";
+import Comments from "../../components/comments/comments";
 
 const PostDetail = (req) => {
   const dispatch = useDispatch();
@@ -25,6 +26,9 @@ const PostDetail = (req) => {
     (state) => state.post
   );
 
+  //for comments
+  const { comments } = useSelector((state) => state.comment);
+  console.log(comments, "comments");
   const { userName, userId } = useSelector((state) => state.auth);
   console.log(req.match.params.id, "Post Detail Params ID");
   useEffect(() => {
@@ -134,14 +138,47 @@ const PostDetail = (req) => {
             <FontAwesomeIcon icon={faEye} />
             <span>{postDetail.views}</span>
           </div>
-          <div className="mb-3">
+          <Row className="mb-3">
             <CKEditor
               editor={BalloonEditor}
               config={editorConfiguration}
               data={postDetail.contents}
               disabled="true"
             />
-          </div>
+          </Row>
+          <Row>
+            <Container className="mb-3 border border-blue rounded">
+              {Array.isArray(comments)
+                ? comments.map(
+                    ({ contents, date, creator, creatorName, _id }) => (
+                      <div key={_id}>
+                        <Row className="justify-content-between p-2">
+                          <div className="font-weight-bold">
+                            {creatorName ? creatorName : creator}
+                          </div>
+                          <div className="text-small">
+                            <span className="font-weight-bold">
+                              {date.split(" ")[0]}
+                            </span>
+                            <span className="font-weight-light">
+                              {" "}
+                              {date.split(" ")[1]}
+                            </span>
+                          </div>
+                        </Row>
+                        <Row className="p-2">{contents}</Row>
+                        <hr />
+                      </div>
+                    )
+                  )
+                : "Creator"}
+              <Comments
+                id={req.match.params.id}
+                userId={userId}
+                userName={userName}
+              />
+            </Container>
+          </Row>
         </Fragment>
       ) : (
         <h1>Hi</h1>

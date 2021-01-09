@@ -8,6 +8,9 @@ import {
   POST_DETAIL_LOADING_SUCCESS,
   POST_DETAIL_LOADING_REQUEST,
   POST_DETAIL_LOADING_FAILURE,
+  POST_DELETE_REQUEST,
+  POST_DELETE_SUCCESS,
+  POST_DELETE_FAILURE,
 } from "../types";
 
 const initialState = {
@@ -79,6 +82,25 @@ const postReducer = (state = initialState, action) => {
         title: action.payload.title,
       };
     case POST_DETAIL_LOADING_FAILURE:
+      return {
+        ...state,
+        error: action.payload,
+        isLoading: false,
+      };
+
+    case POST_DELETE_REQUEST:
+      return {
+        ...state,
+        posts: [],
+        isLoading: true,
+      };
+    case POST_DELETE_SUCCESS:
+      return {
+        ...state,
+        posts: [],
+        isLoading: false,
+      };
+    case POST_DELETE_FAILURE:
       return {
         ...state,
         error: action.payload,
