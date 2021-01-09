@@ -156,4 +156,42 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+//  @route  GET  api/post/:id/edit
+//  @desc   Editing the post
+//  @access Private
+router.get("/:id/edit", async (req, res, next) => {
+  try {
+    const post = await Post.findById(req.params.id).populate("creator", "name");
+    res.json(post);
+  } catch (e) {
+    console.error(e, "GET FIND BY ID ERROR");
+    next(e);
+  }
+});
+
+router.post("/:id/edit", async (req, res, next) => {
+  try {
+    console.log(req, "req for Editing request");
+    const {
+      body: { title, contents, date, fileUrl, id },
+    } = req;
+
+    const modified_post = await Post.findByIdAndUpdate(
+      id,
+      {
+        title,
+        contents,
+        fileUrl,
+        date: moment().format("YYYY-MM-DD hh:mm:ss"),
+      },
+      { new: true }
+    );
+    console.log(modified_post, "modified post");
+    res.redirect(`/api/post/${modified_post.id}`);
+  } catch (e) {
+    console.error(e, "Error on Editing post");
+    next(e);
+  }
+});
+
 export default router;
