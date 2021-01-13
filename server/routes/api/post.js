@@ -66,8 +66,10 @@ router.post("/image", uploadS3.array("upload", 10), async (req, res, next) => {
 //  @access public
 router.get("/", async (req, res) => {
   const postFindResult = await Post.find(); // Post is mongoose model, and contains find() method for finding
-  //console.log(postFindResult, "All Post are found.");
-  res.json(postFindResult);
+  const categoryFindResult = await Category.find();
+  const result = { postFindResult, categoryFindResult };
+  console.log(result, "All Post are found.");
+  res.json(result);
 });
 
 //  @route  POST /api/post/
@@ -244,7 +246,7 @@ router.post("/:id/comments", async (req, res, next) => {
 //  @route  GET  api/post/:id/edit
 //  @desc   Editing the post
 //  @access Private
-router.get("/:id/edit", async (req, res, next) => {
+router.get("/:id/edit", auth, async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.id).populate("creator", "name");
     res.json(post);
@@ -254,7 +256,7 @@ router.get("/:id/edit", async (req, res, next) => {
   }
 });
 
-router.post("/:id/edit", async (req, res, next) => {
+router.post("/:id/edit", auth, async (req, res, next) => {
   try {
     console.log(req, "req for Editing request");
     const {
@@ -275,6 +277,25 @@ router.post("/:id/edit", async (req, res, next) => {
     res.redirect(`/api/post/${modified_post.id}`);
   } catch (e) {
     console.error(e, "Error on Editing post");
+    next(e);
+  }
+});
+
+router.get("/category/:categoryName", async (req, res, next) => {
+  try {
+    const result = await Category.findOne(
+      {
+        categoryName: {
+          $regex: req.params.categoryName,
+          $options: "i",
+        },
+      },
+      "posts"
+    ).populate({ path: "posts" });
+    console.log(result, "Category Result founds");
+    res.send(result);
+  } catch (e) {
+    console.log(e);
     next(e);
   }
 });

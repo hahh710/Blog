@@ -14,6 +14,15 @@ import {
   POST_DELETE_REQUEST,
   POST_DELETE_SUCCESS,
   POST_DELETE_FAILURE,
+  POST_EDIT_LOADING_REQUEST,
+  POST_EDIT_LOADING_SUCCESS,
+  POST_EDIT_LOADING_FAILURE,
+  POST_EDIT_UPLOADING_REQUEST,
+  POST_EDIT_UPLOADING_SUCCESS,
+  POST_EDIT_UPLOADING_FAILURE,
+  CATEGORY_FIND_REQUEST,
+  CATEGORY_FIND_SUCCESS,
+  CATEGORY_FIND_FAILURE,
 } from "../types";
 
 //All Post Load
@@ -141,7 +150,6 @@ function* deletePost(action) {
       type: POST_DELETE_FAILURE,
       payload: e,
     });
-    console.log("Load Post Detail Error");
     yield put(push("/"));
   }
 }
@@ -150,11 +158,125 @@ function* watchDeletePost() {
   yield takeEvery(POST_DELETE_REQUEST, deletePost);
 }
 
+//Post Edit
+const editPostAPI = (payload) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const token = payload.token;
+
+  if (token) {
+    config.headers["x-auth-token"] = token;
+  }
+
+  return axios.get(`/api/post/${payload.id}/edit`, config);
+};
+
+function* editPost(action) {
+  try {
+    const result = yield call(editPostAPI, action.payload);
+
+    yield put({
+      type: POST_EDIT_LOADING_SUCCESS,
+      payload: result.data,
+    });
+
+    yield put(push(`/api/post/${action.payload.id}`));
+  } catch (e) {
+    yield put({
+      type: POST_EDIT_LOADING_FAILURE,
+      payload: e,
+    });
+    console.log("Load Post Detail Error");
+    yield put(push("/"));
+  }
+}
+
+function* watchEditPost() {
+  yield takeEvery(POST_EDIT_LOADING_REQUEST, editPost);
+}
+
+//Post Edit Upload
+const editUploadAPI = (payload) => {
+  const config = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+
+  const token = payload.token;
+
+  if (token) {
+    config.headers["x-auth-token"] = token;
+  }
+
+  return axios.post(`/api/post/${payload.id}/edit`, payload, config);
+};
+
+function* editUpload(action) {
+  try {
+    const result = yield call(editUploadAPI, action.payload);
+
+    yield put({
+      type: POST_EDIT_UPLOADING_SUCCESS,
+      payload: result.data,
+    });
+
+    yield put(push(`/post/${result.data._id}`));
+  } catch (e) {
+    yield put({
+      type: POST_EDIT_UPLOADING_FAILURE,
+      payload: e,
+    });
+    console.log("Load Post Detail Error");
+    yield put(push("/"));
+  }
+}
+
+function* watchEditUpload() {
+  yield takeEvery(POST_EDIT_UPLOADING_REQUEST, editUpload);
+}
+
+//Category Find Result
+const categoryFindAPI = (payload) => {
+  //encodeURIComponent is URI의 특정한 문자를 UTF-8로 인코딩해 4개이하 의 연속된 이스케이프 문자로 나타내줍니다.
+  //encodeURIComponent is used when other languages are used other than english
+  return axios.get(`/api/post/category/${encodeURIComponent(payload)}`);
+};
+
+function* categoryFind(action) {
+  try {
+    const result = yield call(categoryFindAPI, action.payload);
+
+    yield put({
+      type: CATEGORY_FIND_SUCCESS,
+      payload: result.data,
+    });
+  } catch (e) {
+    yield put({
+      type: CATEGORY_FIND_FAILURE,
+      payload: e,
+    });
+    console.log("Category Find result Error");
+    yield put(push("/"));
+  }
+}
+
+function* watchCategoryFind() {
+  yield takeEvery(CATEGORY_FIND_REQUEST, categoryFind);
+}
+
 export default function* postSaga() {
   yield all([
     fork(watchLoadPosts),
     fork(watchuploadPost),
     fork(watchloadPostDetail),
     fork(watchDeletePost),
+    fork(watchEditPost),
+    fork(watchEditUpload),
+    fork(watchCategoryFind),
   ]);
 }
